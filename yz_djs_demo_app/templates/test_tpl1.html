@@ -1,0 +1,19 @@
+<div class="comment">
+	{% if comment.comment_title %}
+		<h3>{{ comment.comment_title }}</h3>
+	{% else %}
+		<h4>Apparently this comment has no title</h4>
+	{% endif %}
+	<p>
+		Author: {{comment.author|default:"Anonymous Coward"}}
+	</p>
+	<p>{{ comment.comment_body }}</p>
+	<p>
+		This comment was created on the 
+		{% if server_or_client_side == 'server' %}
+			<strong>serverside</strong>
+		{% else %}
+			<strong>client side</strong>
+		{% endif %}
+	</p>
+</div>

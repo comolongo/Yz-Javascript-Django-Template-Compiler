@@ -1,0 +1,22 @@
+YZ JavaScript Django Template Compiler
+Copyright (c) 2010 Weiss I Nicht <KeineAhnung@atliva.com> 
+(sha-1: 90f01291285340bf03c2d41952c4b21b3d338907)
+
+To setup the demo:
+
+1. Make sure the yz_js_django_tpl package is in your project path, it should suffice to put it in your base project folder i.e. DJANGO_PROJECT_FOLDER/yz_js_django_tpl
+
+2. Move the yz_djs_demo_app folder to the project path as well, i.e. DJANGO_PROJECT_FOLDER/yz_djs_demo_app
+
+4. Open up yz_djs_demo_app/generate_js_tpl.py and make sure DJANGO_DIRECTORY_PATH points to the base of your django project directory.
+
+5. From the commandline navigate to the demo folder and type:
+python generate_js_tpl.py
+That should autogenerate the django templates from yz_djs_demo_templates into javascript functions
+
+6. In your project DJANGO_PROJECT_FOLDER/settings.py file, add 'yz_djs_demo_app' into the list of installed apps
+
+7. In your project DJANGO_PROJECT_FOLDER/url.py file at the project into the url path by adding     (r'^yz_djs_demo/', include('yz_djs_demo_app.urls')) into the url patterns list
+
+This should be enough to get everything up and running. If you goto your /yz_djs_demo of your project domain, you will be able to see it, otherwise you can always checkout 
+http://yz-demos.appspot.com/yz_djs_demo/ to see what you should be seeing.
