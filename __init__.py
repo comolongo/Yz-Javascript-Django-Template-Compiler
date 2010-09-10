@@ -143,13 +143,17 @@ class JsNodeContext():
     def reset_global_context(cls):
         cls._var_generator_cntr = 0
         cls._global_cross_context_var_list = {}
-    def register_var(self, base_var_name, scope, from_parent_or_child = None, full_var_name = None, var_type='mixed'):
+    def register_var(self, base_var_name, scope, from_parent_or_child = None, full_var_name = None, var_type='input'):
         """
         Registers a variable so it can be rendered into javascript. This ensures that variables global to a given
         closure context in javascript are pass correctly from its parent js node and that each closure is only passed
         the variables that it needs. It also allows for a node to know which variables have been called in its
         parents and child nodes, which could be useful for nodes such as the ForJsNode, which depending on whether or not
         certain variables are called (e.g. forloop.counter), it will choose whether or not to define certain variables
+        
+        var_type - can be either input or implicit . input variables will we passed in via its calling functions via the
+        input parameters, implicit variables will not be passed via the input parameters but will be assumed to be part
+        of the global scope
         """
         if scope == 'local':
             var_list = self.local_vars
@@ -181,7 +185,7 @@ class JsNodeContext():
         for var_name, var_type in new_js_vars.items():
             if var_name not in self.local_vars and \
                 var_name not in self.global_vars:
-                self.register_var(var_name, scope, var_type)
+                self.register_var(var_name, scope, var_type=var_type)
 
     def get_js_var_type(self, js_var_name):
         if js_var_name in self.local_vars:
@@ -191,14 +195,15 @@ class JsNodeContext():
         else:
             raise NameError('variable does not exist')
 
-    def get_input_vars(self):
-        """
-        gets the variables necessary to to populate everything required in the current context
-        generally this means just returning the global variables
-        """
-        return self.global_vars.keys()
+    def get_vars_of_type(self, var_type):
+        var_names = []
+        for js_var_name in self.global_vars:
+            if self.global_vars[js_var_name] == var_type:
+                var_names.append(js_var_name)
 
-    def create_new_var(self, scope, var_type='mixed'):
+        return var_names
+
+    def create_new_var(self, scope, var_type='input'):
         """creates and registers a new variable name to use in javascript"""
         is_taken = True
         cntr = self.__class__._var_generator_cntr
@@ -236,7 +241,7 @@ class BaseJsTpl(object):
         """
         given a javascript expression, wraps it into a closure, e.g. function(if_cond){if(if_cond){return a}}(if_cond,a)
         """
-        input_vars_list = self.context.get_input_vars()
+        input_vars_list = self.context.get_vars_of_type('input')
         if var_list:
             unaccounted_vars = set(input_vars_list).symmetric_difference(set(var_list))
             if len(unaccounted_vars):
@@ -410,7 +415,12 @@ class TemplateJsNode(BaseJsNode):
         self.js_nodes = self.scan_section(django_tpl_node.nodelist)
 
     def generate_js_statement(self):
-        rendered_content = self._wrap_expr_in_js_anon_func(js_expr = self._nodes_to_js_str(self.js_nodes), execute_now = False, var_list = self.var_list)   
+        js_expr       = ''
+        implicit_vars = self.context.get_vars_of_type('implicit')
+        if len(implicit_vars):
+            js_expr += 'var ' + ','.join(implicit_vars) + ';'
+        js_expr += self._nodes_to_js_str(self.js_nodes)
+        rendered_content = self._wrap_expr_in_js_anon_func(js_expr = js_expr, execute_now = False, var_list = self.var_list)   
         rendered_content = strip_spaces_between_tags(rendered_content)
         return remove_whitespaces.sub(' ', rendered_content.strip())
 

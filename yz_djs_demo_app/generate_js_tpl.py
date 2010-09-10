@@ -15,6 +15,8 @@ import settings
 
 #Load files necessary for our specific task
 from yz_js_django_tpl import generate_js_tpl_file, JsTplSettings
+from yz_js_django_tpl.customtags import *
+from yz_js_django_tpl.customfilters import *
 import os
 
 template_generator_configs = {
@@ -27,7 +29,6 @@ template_generator_configs = {
             'test_tpl1.html' : {
             'tpl_func_name': 'yz_djstpl_test_tpl1',
             'var_list': ['comment','server_or_client_side']
-
             }
         }
     }
