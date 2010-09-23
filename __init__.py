@@ -70,6 +70,8 @@ def generate_js_tpl_file():
             for filter_classname in filters_in_use:
                 filter_info = filters_in_use[filter_classname]
                 js_file_path = filter_info['js_file_path']
+                if not js_file_path:
+                    continue
                 js_func_file = open(js_file_path, 'r')
                 js_include_file.write("\n" + js_func_file.read())
                 js_func_file.close()
@@ -237,7 +239,7 @@ class BaseJsTpl(object):
             base_varname = var_obj.lookups[0]
             full_var_name = self.context.register_var(base_varname, scope="global", full_var_name = full_var_name)
         return full_var_name
-    def _wrap_expr_in_js_anon_func(self, js_expr, execute_now = True, var_list = None):
+    def _wrap_expr_in_js_anon_func(self, js_expr, execute_now = True, var_list = None, show_params=False):
         """
         given a javascript expression, wraps it into a closure, e.g. function(if_cond){if(if_cond){return a}}(if_cond,a)
         """
@@ -245,13 +247,20 @@ class BaseJsTpl(object):
         if var_list:
             unaccounted_vars = set(input_vars_list).symmetric_difference(set(var_list))
             if len(unaccounted_vars):
-                raise NameError('The following input variables and given variables do not match: %s' % ','.join(unaccounted_vars))
+                msg = 'Input variables and given variables do not match. \n \
+                    input vars: %s \n \
+                    given vars: %s' % (','.join(input_vars_list), ','.join(var_list))
+                
+                raise NameError(msg)
             input_vars_list = var_list
+        func_params = ''
+        if show_params:
+            func_params = ','.join(input_vars_list)
         if execute_now:
-            func_execution = '(' + ','.join(input_vars_list) + ')'
+            func_execution = '(' + func_params + ')'
         else:
             func_execution = ''
-        return 'function(' + ','.join(input_vars_list) + '){' + js_expr + '}' + func_execution
+        return 'function(' + func_params + '){' + js_expr + '}' + func_execution
     def _wrap_expr_in_js_func(self, func_name, func_params):
         """calls a javascript function, e.g. yzdjs_default(val, defaultVal)"""
         return func_name + '(' + ','.join(func_params) + ')'
@@ -420,7 +429,7 @@ class TemplateJsNode(BaseJsNode):
         if len(implicit_vars):
             js_expr += 'var ' + ','.join(implicit_vars) + ';'
         js_expr += self._nodes_to_js_str(self.js_nodes)
-        rendered_content = self._wrap_expr_in_js_anon_func(js_expr = js_expr, execute_now = False, var_list = self.var_list)   
+        rendered_content = self._wrap_expr_in_js_anon_func(js_expr = js_expr, execute_now = False, var_list = self.var_list, show_params = True)   
         rendered_content = strip_spaces_between_tags(rendered_content)
         return remove_whitespaces.sub(' ', rendered_content.strip())
 

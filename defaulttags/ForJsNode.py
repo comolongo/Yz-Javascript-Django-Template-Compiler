@@ -75,7 +75,7 @@ class ForJsNode(BaseJsNode):
     >>> ###############
     >>> js_tpl = TemplateJsNode('{% for arr_ele in arr %}{% for ele2 in arr2 %}inner loop iterator: {{ forloop.counter }} parent loop iterator: {{ forloop.parentloop.counter }}{% endfor %}{% endfor %}')
     >>> js_tpl.render()
-    u'function(arr,arr2){for(var n0=0,arr_ele,n4,n2=arr.length,n1="";n0<n2;n0++){arr_ele=arr[n0],n4=n0+1;n1+=function(n4,arr2){for(var n9=0,ele2,n13,n11=arr2.length,n10="";n9<n11;n9++){ele2=arr2[n9],n13=n9+1;n10+="inner loop iterator: "+n13+" parent loop iterator: "+n4} return n10}(n4,arr2)} return n1}'
+    u'function(arr,arr2){for(var n0=0,arr_ele,n4,n2=arr.length,n1="";n0<n2;n0++){arr_ele=arr[n0],n4=n0+1;n1+=function(){for(var n9=0,ele2,n13,n11=arr2.length,n10="";n9<n11;n9++){ele2=arr2[n9],n13=n9+1;n10+="inner loop iterator: "+n13+" parent loop iterator: "+n4} return n10}()} return n1}'
     """
     expected_node_classname = 'ForNode'
     def _init_vars(self):

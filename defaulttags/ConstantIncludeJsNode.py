@@ -27,7 +27,9 @@ class ConstantIncludeJsNode(BaseJsNode):
         if 'var_list' in tpl_info:
             tpl_var_list = tpl_info['var_list']
         self.tpl_var_list = tpl_var_list
-        #todo: add tpl_var_list to global var context
+        #add parameters of the include file into the global context of the calling file
+        if tpl_var_list:
+            [self.context.register_var(var_name, 'global') for var_name in tpl_var_list]
         self.update_parent_context()
     def generate_js_statement(self):
         return 'return %s' % self.generate_js_statement_as_closure()

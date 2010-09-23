@@ -1,3 +1,0 @@
-//Auto generated JS file for via yz_js_django_tpl
-
-var yz_djstpl_test_tpl1=function(comment,server_or_client_side){return "<div class=\"comment\"> "+function(comment){if(comment.comment_title){return " <h3>"+comment.comment_title+"</h3> "}else{return " <h4>Apparently this comment has no title</h4> "}}(comment)+" <p> Author: "+yzdjs_default(comment.author,"Anonymous Coward")+" </p><p>"+comment.comment_body+"</p><p> This comment was created on the "+function(server_or_client_side){if(server_or_client_side=="server"){return " <strong>serverside</strong> "}else{return " <strong>client side</strong> "}}(server_or_client_side)+" </p></div>"}

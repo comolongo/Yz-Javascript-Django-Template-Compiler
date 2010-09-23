@@ -27,7 +27,7 @@ class AssignJsNode(BaseJsNode):
     >>> ###############
     >>> js_tpl = TemplateJsNode('{%load assign%} assigning here: {% assign other_str varA|add:"5" %} displaying here: {{ other_str }}')
     >>> js_tpl.render()
-    u'function(varA){var other_str;return " assigning here: "+function(varA){other_str=(varA+5);return ""}(varA)+" displaying here: "+other_str}'
+    u'function(varA){var other_str;return " assigning here: "+function(){other_str=(varA+5);return ""}()+" displaying here: "+other_str}'
     """
     expected_node_classname = 'AssignNode'
     def _init_vars(self):
